@@ -17,7 +17,7 @@ const NetworkSwitcher: FC = () => {
       >
         <option value="mainnet-beta">main</option>
         <option value="devnet">dev</option>
-        <option value="testnet">test</option>
+        {/* <option value="testnet">test</option> */}
       </select>
     </label>
   );

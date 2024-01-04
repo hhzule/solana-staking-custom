@@ -5,6 +5,8 @@ import React, { useState } from "react";
 import { useAutoConnect } from '../contexts/AutoConnectProvider';
 import NetworkSwitcher from './NetworkSwitcher';
 import NavElement from './nav-element';
+import BImage from "./brick.jpeg"
+import Image from 'next/image';
 
 const WalletMultiButtonDynamic = dynamic(
   async () => (await import('@solana/wallet-adapter-react-ui')).WalletMultiButton,
@@ -19,7 +21,15 @@ export const AppBar: React.FC = () => {
       {/* NavBar / Header */}
       <div className="navbar flex h-20 flex-row md:mb-2 shadow-lg bg-black text-neutral-content border-b border-zinc-600 bg-opacity-66">
         <div className="navbar-start align-items-center">
-          <div className="hidden sm:inline w-22 h-22 md:p-2 ml-10">
+       <Image src={BImage}
+       alt="Brick"
+       width={80}
+       height={80}
+       style={{borderRadius:"10px"}}
+       >
+
+       </Image>
+          {/* <div className="hidden sm:inline w-22 h-22 md:p-2 ml-10">
             <Link href="https://solana.com" target="_blank" rel="noopener noreferrer" passHref className="text-secondary hover:text-white">
               <svg width="105%" height="24" viewBox="0 0 646 96" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <g clipPath="url(#clip0_1064_606)">
@@ -46,27 +56,27 @@ export const AppBar: React.FC = () => {
                 </defs>
               </svg>
             </Link>
-          </div>
-          <WalletMultiButtonDynamic className="btn-ghost btn-sm relative flex md:hidden text-lg " />
+          </div> */}
+        <WalletMultiButtonDynamic className="btn-ghost btn-sm relative flex md:hidden text-lg " />
         </div>
 
         {/* Nav Links */}
         {/* Wallet & Settings */}
         <div className="navbar-end">
           <div className="hidden md:inline-flex align-items-center justify-items gap-6">
-          <NavElement
+          {/* <NavElement
             label="Home"
             href="/"
             navigationStarts={() => setIsNavOpen(false)}
-          />
-          <NavElement
+          /> */}
+          {/* <NavElement
             label="Basics"
             href="/basics"
             navigationStarts={() => setIsNavOpen(false)}
-          />
+          /> */}
           <WalletMultiButtonDynamic className="btn-ghost btn-sm rounded-btn text-lg mr-6 " />
         </div>
-          <label
+          {/* <label
               htmlFor="my-drawer"
               className="btn-gh items-center justify-between md:hidden mr-6"
               onClick={() => setIsNavOpen(!isNavOpen)}>
@@ -81,7 +91,7 @@ export const AppBar: React.FC = () => {
             <div className={`absolute block h-0.5 w-8 animate-pulse bg-purple-600 ${isNavOpen ? "" : "hidden"}`}
               style={{ transform: "rotate(135deg)" }}>
             </div>
-        </label>
+        </label> */}
       <div>
         <span className="absolute block h-0.5 w-12 bg-zinc-600 rotate-90 right-14"></span>
       </div>

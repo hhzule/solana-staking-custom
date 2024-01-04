@@ -13,7 +13,7 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
     return (
         <>
           <Head>
-            <title>Solana Scaffold Lite</title>
+            <title>Brick Phone</title>
           </Head>
 
           <ContextProvider>
