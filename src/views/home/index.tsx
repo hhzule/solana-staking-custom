@@ -35,11 +35,11 @@ export const HomeView: FC = ({ }) => {
   const [connection, setConnection] = useState(null)
   const { connection : wconn } = useConnection();
   useEffect(() => {
-    console.log("network", network)
+    console.log("useEffect", network)
 if(network == "mainnet-beta"){
   if (wallet.publicKey ) {
     console.log(wallet.publicKey.toBase58())
-    console.log("network", network)
+    console.log("network mainnet", network)
     const connection = new Connection("https://mainnet.helius-rpc.com/?api-key=78c69964-e500-4354-8f43-eec127b47bd7");
   setConnection(connection)
 
@@ -47,14 +47,14 @@ if(network == "mainnet-beta"){
 }else{
   if (wallet.publicKey ) {
     console.log(wallet.publicKey.toBase58())
-    console.log("network", network)
+    console.log("network devnet", network)
     const connection = wconn
       setConnection(connection)
 
   } 
 }
 
-  }, [])
+  }, [wallet.publicKey,network])
   useEffect(() => {
     console.log("totalSupply")
     if(connection){
