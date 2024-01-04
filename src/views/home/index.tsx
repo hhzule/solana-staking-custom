@@ -39,6 +39,7 @@ export const HomeView: FC = ({ }) => {
 if(network == "mainnet-beta"){
   if (wallet.publicKey ) {
     console.log(wallet.publicKey.toBase58())
+    console.log("network", network)
     const connection = new Connection("https://mainnet.helius-rpc.com/?api-key=78c69964-e500-4354-8f43-eec127b47bd7");
   setConnection(connection)
 
@@ -46,6 +47,7 @@ if(network == "mainnet-beta"){
 }else{
   if (wallet.publicKey ) {
     console.log(wallet.publicKey.toBase58())
+    console.log("network", network)
     const connection = wconn
       setConnection(connection)
 
@@ -54,19 +56,22 @@ if(network == "mainnet-beta"){
 
   }, [])
   useEffect(() => {
+    console.log("totalSupply")
     if(connection){
+      console.log("totalSupply")
       getTotalSupply()
       getUserSOLBalance(wallet.publicKey, connection)
     }
 
-  }, [])
+  }, [connection])
   
 
   const  getTotalSupply = async() =>{
     try {
-      const totalSupply = await getMint(connection,new PublicKey(MINT_ADDRESS));
+      let totalSupply: any = await getMint(connection,new PublicKey(MINT_ADDRESS));
       console.log("totalSupply",totalSupply.supply.toString())
-      setSupply(totalSupply.supply.toString()) 
+      totalSupply = Number(totalSupply.supply.toString())/ 100
+      setSupply(totalSupply) 
     } catch (error) {
       console.log('error', `MINT ADDRESS not found! ${error}`);
    
@@ -90,7 +95,7 @@ if(network == "mainnet-beta"){
 
   setBurnTrx("")
   if(!connection){
-    // notify({ type: 'error', message: `Wallet not connected!` });
+    notify({ type: 'error', message: `Wallet not connected!` });
     console.log('error', `not connected!`);
     return;
   }
