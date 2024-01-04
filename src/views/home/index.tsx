@@ -158,8 +158,8 @@ try {
         lastValidBlockHeight: lastValidBlockHeight
     });
     if (confirmation.value.err) { throw new Error("    ❌ - Transaction not confirmed.") }
-    console.log('🔥 SUCCESSFUL BURN!🔥', '\n', `https://explorer.solana.com/tx/${txid}?cluster=devnet`);
-    setBurnTrx(`https://explorer.solana.com/tx/${txid}?cluster=devnet`)
+    console.log('🔥 SUCCESSFUL BURN!🔥', '\n', `https://explorer.solana.com/tx/${txid}?cluster=mainnet-beta`);
+    setBurnTrx(`https://explorer.solana.com/tx/${txid}?cluster=mainnet-beta`)
     //  console.log(signature);
     await getTotalSupply()
     notify({ type: 'success', message: 'Transaction successful!', txid: signature });
@@ -228,7 +228,6 @@ burn
        
       </p> 
       </div>
-      {/* https://explorer.solana.com/tx/31peF8i9dYfy4BLpeZLpq8bgSygmJoQZ88f1gkyFiWQ1wwmE5xVuo18DVdZ4SQEbhDLQJpP1mpwfZMYcaitxyoyQ?cluster=devnet */}
     
    </div>
     </div>
