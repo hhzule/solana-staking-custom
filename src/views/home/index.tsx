@@ -1,9 +1,10 @@
 // Next, React
 import { FC, useEffect, useState } from 'react';
 import Link from 'next/link';
+import { WalletAdapterNetwork, WalletError } from '@solana/wallet-adapter-base';
 import {
   clusterApiUrl,
-  // Connection,
+  Connection,
   PublicKey,
   Keypair, TransactionMessage, VersionedTransaction ,
   LAMPORTS_PER_SOL,
@@ -18,25 +19,59 @@ import pkg from '../../../package.json';
 
 // Store
 import useUserSOLBalanceStore from '../../stores/useUserSOLBalanceStore';
-
+import { NetworkConfigurationProvider, useNetworkConfiguration } from '../../contexts/NetworkConfigurationProvider';
 //constants
-const MINT_ADDRESS = "zzztJPMUuekbs5EHZqq53mfGFmXRsVDz23h4sGPoy7L"
+
+const MINT_ADDRESS = "bphurXQjc7WbQ1wUJYc2Se8eKUeN8Y28jRm42kPb3Xz"
 const MINT_DECIMALS = 2; // Value for USDC-Dev from spl-token-faucet.com | replace with the no. decimals of mint you would like to burn
 const BURN_QUANTITY = 100;
 export const HomeView: FC = ({ }) => {
+  const { networkConfiguration } = useNetworkConfiguration();
+  const network = networkConfiguration as WalletAdapterNetwork;
+  // const endpoint = () => clusterApiUrl(network)
   const wallet = useWallet();
   const [burnTrx, setBurnTrx] = useState("")
   const [supply, setSupply] = useState("")
-  const { connection } = useConnection();
+  const [connection, setConnection] = useState(null)
+  const { connection : wconn } = useConnection();
   useEffect(() => {
-    getTotalSupply()
+    console.log("network", network)
+if(network == "mainnet-beta"){
+  if (wallet.publicKey ) {
+    console.log(wallet.publicKey.toBase58())
+    const connection = new Connection("https://mainnet.helius-rpc.com/?api-key=78c69964-e500-4354-8f43-eec127b47bd7");
+  setConnection(connection)
+
+  }
+}else{
+  if (wallet.publicKey ) {
+    console.log(wallet.publicKey.toBase58())
+    const connection = wconn
+      setConnection(connection)
+
+  } 
+}
+
+  }, [])
+  useEffect(() => {
+    if(connection){
+      getTotalSupply()
+      getUserSOLBalance(wallet.publicKey, connection)
+    }
+
+  }, [])
   
-   
-  }, [connection])
+
   const  getTotalSupply = async() =>{
-    const totalSupply = await getMint(connection,new PublicKey(MINT_ADDRESS));
-    console.log("totalSupply",totalSupply.supply.toString())
-    setSupply(totalSupply.supply.toString())
+    try {
+      const totalSupply = await getMint(connection,new PublicKey(MINT_ADDRESS));
+      console.log("totalSupply",totalSupply.supply.toString())
+      setSupply(totalSupply.supply.toString()) 
+    } catch (error) {
+      console.log('error', `MINT ADDRESS not found! ${error}`);
+   
+    }
+ 
     // return totalSupply
   }
   const getMintAuth = async()=>{
@@ -52,7 +87,13 @@ export const HomeView: FC = ({ }) => {
   // console.log(`wallet`, wallet.publicKey.toString());
   
  const burnTk = async () =>{
+
   setBurnTrx("")
+  if(!connection){
+    // notify({ type: 'error', message: `Wallet not connected!` });
+    console.log('error', `not connected!`);
+    return;
+  }
   if (!publicKey) {
     notify({ type: 'error', message: `Wallet not connected!` });
     console.log('error', `Send Transaction: Wallet not connected!`);
@@ -127,14 +168,7 @@ try {
  
   const { getUserSOLBalance } = useUserSOLBalanceStore()
 
-  useEffect(() => {
-    if (wallet.publicKey) {
-      console.log(wallet.publicKey.toBase58())
-      // const connection = new Connection("https://mainnet.helius-rpc.com/?api-key=78c69964-e500-4354-8f43-eec127b47bd7");
-    
-      getUserSOLBalance(wallet.publicKey, connection)
-    }
-  }, [wallet.publicKey, connection])
+
 
   return (
 
