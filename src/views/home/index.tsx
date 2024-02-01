@@ -10,7 +10,7 @@ import {
   LAMPORTS_PER_SOL,
 } from "@solana/web3.js";
 // Wallet
-import { createBurnCheckedInstruction, TOKEN_PROGRAM_ID, getAssociatedTokenAddress , getMint} from "@solana/spl-token";
+import { createBurnCheckedInstruction, TOKEN_PROGRAM_ID, getAssociatedTokenAddress ,getMint} from "@solana/spl-token";
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
 import { notify } from "../../utils/notifications";
 // Components
@@ -21,10 +21,9 @@ import pkg from '../../../package.json';
 import useUserSOLBalanceStore from '../../stores/useUserSOLBalanceStore';
 import { NetworkConfigurationProvider, useNetworkConfiguration } from '../../contexts/NetworkConfigurationProvider';
 //constants
-
-const MINT_ADDRESS = "bphurXQjc7WbQ1wUJYc2Se8eKUeN8Y28jRm42kPb3Xz"
+const MINT_ADDRESS = "DGi43C8vkhDBqWRWo1u23iGR2aWkF4Hgpj2Uo8ZGbMwY"
+// const MINT_ADDRESS = "brpN2phpDmaKFSfJR6wKktzdQWeMnCVcFDtUKHyCtFM"
 const MINT_DECIMALS = 2; // Value for USDC-Dev from spl-token-faucet.com | replace with the no. decimals of mint you would like to burn
-const BURN_QUANTITY = 100;
 export const HomeView: FC = ({ }) => {
   const { networkConfiguration } = useNetworkConfiguration();
   const network = networkConfiguration as WalletAdapterNetwork;
@@ -32,14 +31,17 @@ export const HomeView: FC = ({ }) => {
   const wallet = useWallet();
   const [burnTrx, setBurnTrx] = useState("")
   const [supply, setSupply] = useState("")
+  const [amount, setAmount] = useState("")
   const [connection, setConnection] = useState(null)
   const { connection : wconn } = useConnection();
+  const [loading, setLoading] = useState(false)
+
   useEffect(() => {
     console.log("useEffect", network)
 if(network == "mainnet-beta"){
   if (wallet.publicKey ) {
     console.log(wallet.publicKey.toBase58())
-    console.log("network mainnet", network)
+    // console.log("network mainnet", network)
     const connection = new Connection("https://mainnet.helius-rpc.com/?api-key=78c69964-e500-4354-8f43-eec127b47bd7");
   setConnection(connection)
 
@@ -47,7 +49,7 @@ if(network == "mainnet-beta"){
 }else{
   if (wallet.publicKey ) {
     console.log(wallet.publicKey.toBase58())
-    console.log("network devnet", network)
+    // console.log("network devnet", network)
     const connection = wconn
       setConnection(connection)
 
@@ -56,9 +58,9 @@ if(network == "mainnet-beta"){
 
   }, [wallet.publicKey,network])
   useEffect(() => {
-    console.log("totalSupply")
+    // console.log("totalSupply")
     if(connection){
-      console.log("totalSupply")
+      // console.log("totalSupply")
       getTotalSupply()
       getUserSOLBalance(wallet.publicKey, connection)
     }
@@ -92,16 +94,18 @@ if(network == "mainnet-beta"){
   // console.log(`wallet`, wallet.publicKey.toString());
   
  const burnTk = async () =>{
-
+setLoading(true);
   setBurnTrx("")
   if(!connection){
     notify({ type: 'error', message: `Wallet not connected!` });
     console.log('error', `not connected!`);
+    setLoading(false);
     return;
   }
   if (!publicKey) {
     notify({ type: 'error', message: `Wallet not connected!` });
     console.log('error', `Send Transaction: Wallet not connected!`);
+    setLoading(false);
     return;
 }
 let mintAuthority = (await getMintAuth()).toLowerCase()
@@ -111,6 +115,7 @@ let conWal = wallet.publicKey.toString().toLowerCase()
 if (mintAuthority !== conWal) {
   notify({ type: 'error', message: `Connected wallet is not mint authority` });
   console.log('error', `unauthorised to burn`);
+  setLoading(false);
   return;
 }
 
@@ -129,7 +134,7 @@ try {
        account, // PublicKey of Owner's Associated Token Account
        new PublicKey(MINT_ADDRESS), // Public Key of the Token Mint Address
        wallet.publicKey, // Public Key of Owner's Wallet
-       BURN_QUANTITY * (10**MINT_DECIMALS), // Number of tokens to burn
+       Number(amount) * (10**MINT_DECIMALS), // Number of tokens to burn
        MINT_DECIMALS // Number of Decimals of the Token Mint
      );
     //  console.log(`    ✅ - Burn Instruction Created`);  
@@ -163,9 +168,11 @@ try {
     //  console.log(signature);
     await getTotalSupply()
     notify({ type: 'success', message: 'Transaction successful!', txid: signature });
-} catch (error: any) {
+    setLoading(false);
+  } catch (error: any) {
     notify({ type: 'error', message: `Transaction failed!`, description: error?.message, txid: signature });
     console.log('error', `Transaction failed! ${error?.message}`, signature);
+    setLoading(false);
     return;
 }
  }
@@ -178,7 +185,7 @@ try {
   return (
 
     <div className="md:hero mx-auto p-4">
-      <div className="md:hero-content h-[300px] justify-around flex flex-col">
+      <div className="md:hero-content h-[500px] justify-around flex flex-col">
         <div className='mt-6'>
         {/* <div className='text-sm font-normal align-bottom text-right text-slate-600 mt-4'>v{pkg.version}</div> */}
         <h1 className="text-center text-3xl md:pl-12 font-bold text-transparent bg-clip-text bg-gradient-to-br from-indigo-500 to-fuchsia-500 mb-4">
@@ -212,19 +219,34 @@ try {
           }
           </h4>
     {/* burn token */}
-    <button className=' w-[90px] h-[40px] shadow-sm shadow-gray-400 rounded-[10px] bg-red-600' onClick={()=>burnTk()}>
-burn
+    <input
+    type='number'
+    min={0}
+    max={supply}
+    value={amount}
+    onChange={(e) => setAmount(e.target.value)}
+    style={{color: 'black', marginBottom: '10px'}}
+    
+    >
+    </input>
+    <button 
+    disabled={loading}
+    className=' w-[90px] h-[40px] shadow-sm shadow-gray-400 rounded-[10px] bg-red-600' 
+    onClick={()=>burnTk()}>
+{loading ? "Burning ..." : "Burn"}
     </button>
       </div >
       <div className="text-center ">
     
     <p className="text-center "> 
       {burnTrx && 
-      <p className=' flex flex-col h-[100px] justify-around items-center'> View on explorer
+      <div className=' flex flex-col h-[150px] justify-around items-center'> 
+      <p className=' mb-[20px]'>View on explorer</p>
       <a href={burnTrx}><button className=' w-[90px] h-[40px] shadow-sm shadow-gray-400 rounded-[10px] bg-teal-500'>click</button>
       </a>
-        
-        </p>}
+        <span>{`${burnTrx}`}</span>
+      
+        </div>}
        
       </p> 
       </div>
