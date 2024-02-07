@@ -9,6 +9,7 @@ import {
   Keypair, TransactionMessage, VersionedTransaction ,
   LAMPORTS_PER_SOL,
 } from "@solana/web3.js";
+
 // Wallet
 import { createBurnCheckedInstruction, TOKEN_PROGRAM_ID, getAssociatedTokenAddress ,getMint} from "@solana/spl-token";
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
@@ -17,17 +18,18 @@ import { notify } from "../../utils/notifications";
 import { RequestAirdrop } from '../../components/RequestAirdrop';
 import pkg from '../../../package.json';
 import { useRouter } from 'next/router';
+
 // Store
 import useUserSOLBalanceStore from '../../stores/useUserSOLBalanceStore';
 import { NetworkConfigurationProvider, useNetworkConfiguration } from '../../contexts/NetworkConfigurationProvider';
 //constants
-const MINT_ADDRESS = "DGi43C8vkhDBqWRWo1u23iGR2aWkF4Hgpj2Uo8ZGbMwY"
-// const MINT_ADDRESS = "brpN2phpDmaKFSfJR6wKktzdQWeMnCVcFDtUKHyCtFM"
-const MINT_DECIMALS = 2; // Value for USDC-Dev from spl-token-faucet.com | replace with the no. decimals of mint you would like to burn
+const MINT_ADDRESS = "2u5bEpkZ4QeR4CcFZJKwiNgDDJnXmzRj35JCiEU91muQ"
+const MINT_DECIMALS = 6; // Value for USDC-Dev from spl-token-faucet.com | replace with the no. decimals of mint you would like to burn
 
 
-export const HomeView: FC = ({ }) => {
-  const router = useRouter();
+export const ElonView: FC = ({ }) => {
+    const router = useRouter();
+    const { publicKey } = useWallet();
   const { networkConfiguration } = useNetworkConfiguration();
   const network = networkConfiguration as WalletAdapterNetwork;
   // const endpoint = () => clusterApiUrl(network)
@@ -75,7 +77,7 @@ if(network == "mainnet-beta"){
     try {
       let totalSupply: any = await getMint(connection,new PublicKey(MINT_ADDRESS));
       console.log("totalSupply",totalSupply.supply.toString())
-      totalSupply = Number(totalSupply.supply.toString())/ 100
+      totalSupply = Number(totalSupply.supply.toString())/  (10**MINT_DECIMALS)
       setSupply(totalSupply) 
     } catch (error) {
       console.log('error', `MINT ADDRESS not found! ${error}`);
@@ -93,7 +95,7 @@ if(network == "mainnet-beta"){
 // connection
   const balance = useUserSOLBalanceStore((s) => s.balance)
   // console.log("first balance", balance);
-  const { publicKey } = useWallet();
+
   // console.log(`wallet`, wallet.publicKey.toString());
   
  const burnTk = async () =>{
@@ -140,6 +142,7 @@ try {
        Number(amount) * (10**MINT_DECIMALS), // Number of tokens to burn
        MINT_DECIMALS // Number of Decimals of the Token Mint
      );
+     
     //  console.log(`    ✅ - Burn Instruction Created`);  
        // Step 3 - Fetch Blockhash
     // console.log(`Step 3 - Fetch Blockhash`);
@@ -183,15 +186,14 @@ try {
  
   const { getUserSOLBalance } = useUserSOLBalanceStore()
 
-  const onClick = () => {
+const onClick = () => {
     router.push("/")
 }
 
-
   return (
 
-    <div className=" mx-auto p-4">
-                 <div className="flex flex-row justify-center">
+    <div className=" mx-auto p-3">
+           <div className="flex flex-row justify-center">
                <button
                     className="group w-40 m-2 btn animate-pulse bg-gradient-to-br from-indigo-500 to-fuchsia-500 hover:from-white hover:to-purple-300 text-black"
                     onClick={onClick} 
@@ -203,8 +205,8 @@ try {
                 </button>
            
         </div>
-      <div className="md:hero-content h-[500px] justify-around flex flex-col">
-        <div className='mt-6'>
+      <div className="md:hero-content h-[300px] justify-around flex flex-col">
+        <div className='mt-3'>
         {/* <div className='text-sm font-normal align-bottom text-right text-slate-600 mt-4'>v{pkg.version}</div> */}
         <h1 className="text-center text-3xl md:pl-12 font-bold text-transparent bg-clip-text bg-gradient-to-br from-indigo-500 to-fuchsia-500 mb-4">
          Admin
@@ -218,7 +220,7 @@ try {
          
           <div className="flex flex-row justify-center">
           <div className='text-slate-600 mr-2'>
-               Brick Phone {" "}
+               Clifford Inu {" "}
               </div>
             <div> Total Supply : {" "}
               {(supply || 0).toLocaleString()}

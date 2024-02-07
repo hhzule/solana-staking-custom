@@ -42,6 +42,9 @@ export const SignMessage: FC = () => {
                     <span className="block group-disabled:hidden" > 
                         Sign Message 
                     </span>
+                    <span className="block group-disabled:hidden" > 
+                        Sign Message 
+                    </span>
                 </button>
             </div>
         </div>

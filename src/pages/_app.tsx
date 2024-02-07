@@ -13,7 +13,7 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
     return (
         <>
           <Head>
-            <title>Brick Phone</title>
+            <title> Burn Token</title>
           </Head>
 
           <ContextProvider>
