@@ -1,19 +1,20 @@
 import type { NextPage } from "next";
 import Head from "next/head";
-import { HomeView } from "../views";
+import { HomeView, CreateView } from "../views";
 import { SelectToken } from '../components/SelectToken';
+
 const Home: NextPage = (props) => {
   return (
     <div>
       <Head>
-        <title>TOKEN BURN</title>
+        <title>Solana Token Creator</title>
         <meta
           name="description"
-          content="TOKEN BURN"
+          content="token Creator"
         />
       </Head>
-      {/* <HomeView /> */}
-      <SelectToken/>
+      <CreateView />
+      {/* <SelectToken/> */}
     </div>
   );
 };
