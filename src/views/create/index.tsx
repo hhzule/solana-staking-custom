@@ -84,12 +84,29 @@ export const CreateView: FC = ({ }) => {
   };
 
   const createToken = useCallback(async (token: any) => {
+    if(!connection){
+      notify({ type: "error", message: "Connect Wallet" });
+      setLoading(true);
+      console.log("token data", token); 
+      return;
+
+    }
+    if(!publicKey){
+      notify({ type: "error", message: "Connect Wallet" });
+      setLoading(true);
+      console.log("token data", token); 
+      return;
+
+    }
+    
+    
     if (!isSupplyValid()) {
       notify({ type: "error", message: "(Supply * (10 **decimals)) should be less than 1844674407709551615" });
+      setLoading(true);
+    console.log("token data", token);
       return;
     }
-    setLoading(true);
-    console.log("token data", token);
+   
 
     if (!token.name || !token.symbol || !token.amount || !token.description || !token.decimals || !token.image || token.supply) {
       notify({ type: "error", message: "fields missing required" });
@@ -177,6 +194,16 @@ export const CreateView: FC = ({ }) => {
   const handleImageChange = async (e: any) => {
     const file = e.target.files[0];
     console.log(file, "file");
+    if(!connection){
+      notify({ type: "error", message: "Connect Wallet" });
+      return;
+
+    }
+    if(!publicKey){
+      notify({ type: "error", message: "Connect Wallet" });
+      return;
+
+    }
     if (file) {
       setIsLoadingImage(true);
       const imgUrl: any = await uploadImagePinata(file);
