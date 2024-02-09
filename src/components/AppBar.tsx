@@ -29,7 +29,7 @@ export const AppBar: React.FC = () => {
       <div className="navbar flex h-20 flex-row md:mb-2 shadow-lg bg-black text-neutral-content border-b border-zinc-600 bg-opacity-66">
         <div className="navbar-start align-items-center">
        <Image src={imageD }
-       alt="BURN Token"
+       alt="Create Token"
        width={80}
        height={80}
        style={{borderRadius:"10px"}}
