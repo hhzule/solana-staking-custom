@@ -30,7 +30,7 @@ import { notify } from "../../utils/notifications";
 import axios from "axios";
 // Components
 import { RequestAirdrop } from "../../components/RequestAirdrop";
-import pkg from "../../../../package.json";
+import pkg from '../../../package.json';
 
 import { useRouter } from "next/router";
 // Store
