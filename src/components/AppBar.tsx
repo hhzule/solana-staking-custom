@@ -9,6 +9,7 @@ import { useRouter } from 'next/router';
 // import { useParams } from 'next/navigation';
 import Elon from "./cliff.jpeg"
 import BImage from "./brick.jpeg"
+import imageD from "./solanaLogo.png"
 import Image from 'next/image';
 
 const WalletMultiButtonDynamic = dynamic(
@@ -20,7 +21,7 @@ export const AppBar: React.FC = () => {
   const router = useRouter();
   let curr_url = router.pathname
   console.log("current",curr_url);
-  let imageD = curr_url == "/" ? "" : curr_url == "/brick" ? BImage : Elon
+  // let imageD = curr_url == "/" ? "" : curr_url == "/brick" ? BImage : Elon
   const { autoConnect, setAutoConnect } = useAutoConnect();
   const [isNavOpen, setIsNavOpen] = useState(false);
   return (
@@ -28,7 +29,7 @@ export const AppBar: React.FC = () => {
       {/* NavBar / Header */}
       <div className="navbar flex h-20 flex-row md:mb-2 shadow-lg bg-black text-neutral-content border-b border-zinc-600 bg-opacity-66">
         <div className="navbar-start align-items-center">
-       <Image src={imageD }
+       <Image src={imageD}
        alt="Create Token"
        width={80}
        height={80}

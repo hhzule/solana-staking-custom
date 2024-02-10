@@ -34,6 +34,7 @@ import pkg from '../../../package.json';
 
 import { useRouter } from "next/router";
 // Store
+
 import useUserSOLBalanceStore from "../../stores/useUserSOLBalanceStore";
 import { NetworkConfigurationProvider, useNetworkConfiguration } from "../../contexts/NetworkConfigurationProvider";
 import { is } from "immer/dist/internal";
@@ -44,7 +45,7 @@ export const CreateView: FC = ({ }) => {
 
   const { connection: wconn } = useConnection();
   const { publicKey, sendTransaction } = useWallet();
-  const { networkConfiguration } = useNetworkConfiguration();
+  const { networkConfiguration , setNetworkConfiguration} = useNetworkConfiguration();
   const network = networkConfiguration as WalletAdapterNetwork;
   // const endpoint = () => clusterApiUrl(network)
   const wallet = useWallet();
@@ -240,19 +241,27 @@ export const CreateView: FC = ({ }) => {
   };
 
   useEffect(() => {
-    if (network == "mainnet-beta") {
-      if (wallet.publicKey) {
-        console.log(wallet.publicKey.toBase58());
-        const connection = new Connection("https://mainnet.helius-rpc.com/?api-key=78c69964-e500-4354-8f43-eec127b47bd7");
-        setConnection(connection);
-      }
-    } else {
-      if (wallet.publicKey) {
-        console.log(wallet.publicKey.toBase58());
-        const connection = wconn;
-        setConnection(connection);
-      }
+    console.log("use effect network", network);
+    if(network == "devnet"){
+      setNetworkConfiguration("mainnet-beta") 
     }
+    // if (network == "mainnet-beta") {
+      // setNetworkConfiguration(e.target.value)
+      console.log("use effect network", network);
+      if (wallet.publicKey) {
+        console.log(wallet.publicKey.toBase58());
+        const  connection = new Connection("https://mainnet.helius-rpc.com/?api-key=78c69964-e500-4354-8f43-eec127b47bd7");
+        setConnection(connection);
+      }
+   
+    // } else {
+    //   if (wallet.publicKey) {
+    //     console.log(wallet.publicKey.toBase58());
+    //     const connection = wconn;
+    //     setConnection(connection);
+    //   }
+    // }
+  
   }, [wallet.publicKey, network]);
 
   useEffect(() => {
