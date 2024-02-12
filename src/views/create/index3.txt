@@ -45,7 +45,7 @@ export const CreateView: FC = ({ }) => {
 
   const { connection: wconn } = useConnection();
   const { publicKey, sendTransaction } = useWallet();
-  const { networkConfiguration, setNetworkConfiguration } = useNetworkConfiguration();
+  const { networkConfiguration , setNetworkConfiguration} = useNetworkConfiguration();
   const network = networkConfiguration as WalletAdapterNetwork;
   // const endpoint = () => clusterApiUrl(network)
   const wallet = useWallet();
@@ -77,34 +77,7 @@ export const CreateView: FC = ({ }) => {
       image: ""
     });
 
-  const [amountError, setAmountError] = useState(false);
-  const [decimalsError, setDecimalsError] = useState(false);
-
   const handleFormfieldchange = (fieldName: any, e: any) => {
-
-    if (fieldName == "amount") {
-      if (e.target.value.length > 10) {
-        setAmountError(true);
-        // wait for 1 second and then clear the error
-        setTimeout(() => {
-          setAmountError(false);
-        }, 1000);
-        return;
-      }
-      else
-        setAmountError(false);
-    }
-    if (fieldName == "decimals") {
-      if (Number(e.target.value) > 9) {
-        setDecimalsError(true);
-        setTimeout(() => {
-          setDecimalsError(false);
-        }, 1000);
-        return;
-      }
-      else
-        setDecimalsError(false);
-    }
     setToken({
       ...token,
       [fieldName]: e.target.value
@@ -114,24 +87,29 @@ export const CreateView: FC = ({ }) => {
   const createToken = useCallback(async (token: any) => {
     if (!connection) {
       notify({ type: "error", message: "Connect Wallet" });
+      console.log("token data", token);
       return;
 
     }
     if (!publicKey) {
       notify({ type: "error", message: "Connect Wallet" });
+      console.log("token data", token);
+      return;
+
+    }
+
+
+    if (!isSupplyValid()) {
+      notify({ type: "error", message: "(Supply * (10 **decimals)) should be less than 1844674407709551615" });
+      console.log("token data", token);
       return;
     }
+
 
     if (!token.name || !token.symbol || !token.amount || !token.description || !token.decimals || !token.image || token.supply) {
-      notify({ type: "error", message: "Required field missing" });
+      notify({ type: "error", message: "fields missing required" });
       return;
     }
-
-    if (!isSupplyValid(token)) {
-      notify({ type: "error", message: "(Supply * (10 **decimals)) should be less than 1844674407709551615" });
-      return;
-    }
-
 
     setLoading(true);
 
@@ -142,6 +120,7 @@ export const CreateView: FC = ({ }) => {
 
     try {
       const metadataUrl: any = await uploadMetadata(token);
+      console.log(metadataUrl);
       // const metadataUrl =
       // "https://gateway.pinata.cloud/ipfs/QmdxcSSGeCegUBuqRG4D3mY3UpbEpEuRvK8neZNqPDW
       // MXF"
@@ -214,6 +193,7 @@ export const CreateView: FC = ({ }) => {
 
   const handleImageChange = async (e: any) => {
     const file = e.target.files[0];
+    console.log(file, "file");
     if (!connection) {
       notify({ type: "error", message: "Connect Wallet" });
       return;
@@ -232,6 +212,7 @@ export const CreateView: FC = ({ }) => {
         ...token,
         image: imgUrl
       });
+      console.log(imgUrl, "imgUrl");
     }
   };
 
@@ -260,16 +241,19 @@ export const CreateView: FC = ({ }) => {
   };
 
   useEffect(() => {
-    if (network == "devnet") {
-      setNetworkConfiguration("mainnet-beta")
+    console.log("use effect network", network);
+    if(network == "devnet"){
+      setNetworkConfiguration("mainnet-beta") 
     }
     // if (network == "mainnet-beta") {
-    // setNetworkConfiguration(e.target.value)
-    if (wallet.publicKey) {
-      const connection = new Connection("https://mainnet.helius-rpc.com/?api-key=78c69964-e500-4354-8f43-eec127b47bd7");
-      setConnection(connection);
-    }
-
+      // setNetworkConfiguration(e.target.value)
+      console.log("use effect network", network);
+      if (wallet.publicKey) {
+        console.log(wallet.publicKey.toBase58());
+        const  connection = new Connection("https://mainnet.helius-rpc.com/?api-key=78c69964-e500-4354-8f43-eec127b47bd7");
+        setConnection(connection);
+      }
+   
     // } else {
     //   if (wallet.publicKey) {
     //     console.log(wallet.publicKey.toBase58());
@@ -277,7 +261,7 @@ export const CreateView: FC = ({ }) => {
     //     setConnection(connection);
     //   }
     // }
-
+  
   }, [wallet.publicKey, network]);
 
   useEffect(() => {
@@ -288,17 +272,40 @@ export const CreateView: FC = ({ }) => {
 
   const balance = useUserSOLBalanceStore((s) => s.balance);
 
+  const burnTk = async () => {
+    setLoading(true);
+    setBurnTrx("");
+    if (!connection) {
+      notify({ type: "error", message: `Wallet not connected!` });
+      console.log("error", `not connected!`);
+      setLoading(false);
+      return;
+    }
+    if (!publicKey) {
+      notify({ type: "error", message: `Wallet not connected!` });
+      console.log("error", `Send Transaction: Wallet not connected!`);
+      setLoading(false);
+      return;
+    }
+  };
+
   const { getUserSOLBalance } = useUserSOLBalanceStore();
 
   const onClick = () => {
     router.push("/");
   };
 
-  const isSupplyValid = (inputToken) => {
-    const amount = BigInt(inputToken.amount);
-    const decimals = BigInt(inputToken.decimals);
+  const isFormValid = () => {
+    return (token.name !== "" && token.amount !== "" && token.symbol !== "" && token.description !== "" && token.decimals != "" && token.image !== "" && !isLoadingImage!)
+  }
+
+  const isSupplyValid = () => {
+    const amount = BigInt(token.amount);
+    const decimals = BigInt(token.decimals);
     const maxSupply = BigInt("1844674407709551615");
     const calculatedSupply = amount * BigInt(10 ** Number(decimals));
+    console.log(calculatedSupply, "calculatedSupply");
+    console.log(maxSupply, "maxSupply");
     return calculatedSupply <= maxSupply;
   };
 
@@ -360,7 +367,6 @@ export const CreateView: FC = ({ }) => {
               value={token.amount}
               onChange={(e) => handleFormfieldchange("amount", e)}
               className="input-style" />
-            {amountError && <div className="text-yellow-500">Supply should be less than 9999999999</div>}
           </div>
 
           <div>
@@ -373,7 +379,6 @@ export const CreateView: FC = ({ }) => {
               value={token.decimals}
               onChange={(e) => handleFormfieldchange("decimals", e)}
               className="input-style" />
-            {decimalsError && <div className="text-yellow-500">Decimals should be less than 10</div>}
           </div>
 
           {isLoadingImage
@@ -384,7 +389,7 @@ export const CreateView: FC = ({ }) => {
               <div>
                 {token.image && (
                   <div>
-                    <label className="label-purple" htmlFor="image">
+                    <label className="label-green" htmlFor="image">
                       Selected Image
                     </label>
                     <br />
@@ -409,6 +414,8 @@ export const CreateView: FC = ({ }) => {
             Create
           </button>
         </div>
+
+        {/* Placeholder for burnTrx */}
       </div>
     </div>
 
